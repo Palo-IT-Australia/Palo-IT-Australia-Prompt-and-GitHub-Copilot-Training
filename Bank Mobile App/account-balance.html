@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Name of Bank</title>
+  <style>
+    /* ── Lo-fi / wireframe aesthetic ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #f0ece4;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 0;
+    }
+
+    /* Phone shell */
+    .phone {
+      width: 375px;
+      min-height: 812px;
+      background: #faf8f3;
+      border: 3px solid #2a2a2a;
+      border-radius: 40px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 6px 6px 0 #2a2a2a;
+      position: relative;
+    }
+
+    /* Notch */
+    .notch {
+      width: 120px;
+      height: 22px;
+      background: #2a2a2a;
+      border-radius: 0 0 14px 14px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    .header {
+      padding: 16px 24px 12px;
+      border-bottom: 2px dashed #2a2a2a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .bank-name {
+      font-size: 1.15rem;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #2a2a2a;
+    }
+
+    .bank-name span {
+      display: inline-block;
+      background: #2a2a2a;
+      color: #faf8f3;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-right: 4px;
+    }
+
+    .header-icons {
+      display: flex;
+      gap: 12px;
+      font-size: 1.2rem;
+    }
+
+    /* ── Greeting ── */
+    .greeting {
+      padding: 20px 24px 6px;
+    }
+
+    .greeting p {
+      font-size: 0.75rem;
+      color: #666;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .greeting h2 {
+      font-size: 1.2rem;
+      color: #2a2a2a;
+      margin-top: 2px;
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      padding: 18px 24px 8px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #888;
+      border-top: 1px solid #ddd;
+    }
+
+    /* ── Account cards ── */
+    .accounts {
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card {
+      border: 2px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #faf8f3;
+      position: relative;
+      box-shadow: 3px 3px 0 #2a2a2a;
+    }
+
+    .card.savings   { background: #fffef0; }
+    .card.offset    { background: #f0f7ff; }
+    .card.mortgage  { background: #fff0f0; }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .card-type {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #888;
+    }
+
+    .card-icon {
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .card-name {
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: #2a2a2a;
+      margin-bottom: 12px;
+    }
+
+    .card-balance-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .balance-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888;
+    }
+
+    .balance-amount {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #2a2a2a;
+      letter-spacing: -0.02em;
+    }
+
+    .balance-amount.negative { color: #b03030; }
+
+    .card-acct-no {
+      font-size: 0.65rem;
+      color: #aaa;
+      margin-top: 8px;
+      letter-spacing: 0.06em;
+    }
+
+    .card-tag {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 0.6rem;
+      background: #2a2a2a;
+      color: #faf8f3;
+      padding: 2px 7px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .card-tag.green  { background: #3a7a3a; }
+    .card-tag.blue   { background: #2a4a8a; }
+    .card-tag.red    { background: #8a2a2a; }
+
+    /* ── Spacer ── */
+    .spacer { flex: 1; }
+
+    /* ── Chatbot section ── */
+    .chatbot-bar {
+      border-top: 2px dashed #2a2a2a;
+      padding: 14px 16px;
+      background: #faf8f3;
+    }
+
+    .chatbot-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    .chat-prompt {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 2px solid #2a2a2a;
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #fff;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 #2a2a2a;
+      transition: transform 0.08s, box-shadow 0.08s;
+    }
+
+    .chat-prompt:active {
+      transform: translate(2px, 2px);
+      box-shadow: none;
+    }
+
+    .chat-avatar {
+      width: 32px;
+      height: 32px;
+      border: 2px solid #2a2a2a;
+      border-radius: 50%;
+      background: #2a2a2a;
+      color: #faf8f3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .chat-text {
+      flex: 1;
+    }
+
+    .chat-text strong {
+      display: block;
+      font-size: 0.8rem;
+      color: #2a2a2a;
+    }
+
+    .chat-text span {
+      font-size: 0.68rem;
+      color: #888;
+    }
+
+    .chat-arrow {
+      font-size: 1rem;
+      color: #2a2a2a;
+    }
+
+    /* ── Bottom nav ── */
+    .bottom-nav {
+      border-top: 2px solid #2a2a2a;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0 18px;
+      background: #faf8f3;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888;
+      cursor: pointer;
+    }
+
+    .nav-item.active { color: #2a2a2a; }
+
+    .nav-item .nav-icon {
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .nav-item.active .nav-icon {
+      border-bottom: 2px solid #2a2a2a;
+      padding-bottom: 1px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- Notch -->
+  <div class="notch"></div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="bank-name"><span>N</span>ame of Bank</div>
+    <div class="header-icons">
+      <span title="Notifications">&#9900;</span>
+      <span title="Profile">&#9711;</span>
+    </div>
+  </div>
+
+  <!-- Greeting -->
+  <div class="greeting">
+    <p>Good morning</p>
+    <h2>Alex Johnson &#128075;</h2>
+  </div>
+
+  <!-- Accounts label -->
+  <div class="section-label">My Accounts</div>
+
+  <!-- Account Cards -->
+  <div class="accounts">
+
+    <!-- Savings -->
+    <div class="card savings">
+      <div class="card-header">
+        <div>
+          <div class="card-type">Savings Account</div>
+        </div>
+        <div class="card-icon">&#128181;</div>
+      </div>
+      <div class="card-name">Everyday Saver</div>
+      <div class="card-balance-row">
+        <div>
+          <div class="balance-label">Available Balance</div>
+          <div class="balance-amount">$24,803.57</div>
+        </div>
+      </div>
+      <div class="card-acct-no">BSB 062-000 &nbsp;&#183;&nbsp; Acct 1234 5678</div>
+      <span class="card-tag green">+2.10% p.a.</span>
+    </div>
+
+    <!-- Mortgage Offset -->
+    <div class="card offset">
+      <div class="card-header">
+        <div>
+          <div class="card-type">Mortgage Offset Account</div>
+        </div>
+        <div class="card-icon">&#127968;</div>
+      </div>
+      <div class="card-name">Home Offset</div>
+      <div class="card-balance-row">
+        <div>
+          <div class="balance-label">Offset Balance</div>
+          <div class="balance-amount">$61,250.00</div>
+        </div>
+      </div>
+      <div class="card-acct-no">BSB 062-000 &nbsp;&#183;&nbsp; Acct 8765 4321</div>
+      <span class="card-tag blue">Linked to Mortgage</span>
+    </div>
+
+    <!-- Mortgage Loan -->
+    <div class="card mortgage">
+      <div class="card-header">
+        <div>
+          <div class="card-type">Mortgage Loan Account</div>
+        </div>
+        <div class="card-icon">&#128196;</div>
+      </div>
+      <div class="card-name">Hone Lona</div>
+      <div class="card-balance-row">
+        <div>
+          <div class="balance-label">Outstanding Balance</div>
+          <div class="balance-amount negative">-$412,588.43</div>
+        </div>
+      </div>
+      <div class="card-acct-no">BSB 062-000 &nbsp;&#183;&nbsp; Loan 3344 5566</div>
+      <span class="card-tag red">5.89% p.a. variable</span>
+    </div>
+
+  </div>
+
+  <!-- Spacer pushes chatbot to bottom -->
+  <div class="spacer"></div>
+
+  <!-- Chatbot section -->
+  <div class="chatbot-bar">
+    <div class="chatbot-label">&#9135; Need help?</div>
+      <div class="chat-prompt" role="button" tabindex="0" aria-label="Open Name of Bank virtual assistant">
+      <div class="chat-avatar">&#129302;</div>
+      <div class="chat-text">
+        <strong>Ask Nova, your assistant</strong>
+        <span>Transfers, statements, loan queries&hellip;</span>
+      </div>
+      <div class="chat-arrow">&#10095;</div>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <span class="nav-icon">&#9632;</span>
+      <span>Home</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">&#8651;</span>
+      <span>Pay</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">&#9741;</span>
+      <span>Cards</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">&#9776;</span>
+      <span>More</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
