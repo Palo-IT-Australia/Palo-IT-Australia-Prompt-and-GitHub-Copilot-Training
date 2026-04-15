@@ -1,0 +1,222 @@
+================================================================================
+Microsoft Teams - Meeting Transcript
+================================================================================
+Meeting:    Product Discovery - New Flight Booking System Feature
+Date:       Tuesday, 17 March 2026
+Time:       10:00 AM - 10:32 AM AEDT
+Duration:   32 minutes
+Organiser:  Sarah Mitchell
+
+Attendees:
+  - Sarah Mitchell         (Product Owner)
+  - James Nguyen           (Business Analyst)
+  - Claire O'Brien         (Tech Lead)
+  - David Okafor           (Operations Representative)
+
+Note: Auto-generated transcript. Not reviewed.
+================================================================================
+
+TRANSCRIPT
+--------------------------------------------------------------------------------
+
+[10:00 AM]
+
+Sarah Mitchell (Product Owner)                                           10:00
+  Good morning everyone, thanks for joining. Let's get started -- we have 30
+  minutes so I'll try to keep us on track. Today's session is a product
+  discovery for what we're internally calling the Smart Ancillary Booking
+  feature. The idea is to reimagine how passengers add extras -- seat upgrades,
+  meal preferences, baggage -- during the booking flow rather than just at
+  check-in. James, do you want to give a quick overview of what we've gathered
+  so far from the research?
+
+James Nguyen (Business Analyst)                                          10:02
+  Sure. So, from the customer research and a review of the competitor landscape
+  -- Lufthansa, Emirates, Singapore Airlines -- we know that passengers are
+  significantly more likely to purchase ancillaries when they're offered in
+  context during the booking journey, not as a separate step after purchase.
+  We've also done an internal data pull, and right now roughly 62% of our seat
+  upgrades are happening at the airport, which is super late and actually
+  creates a lot of friction for the ops team. David, you'd know better than
+  I do.
+
+David Okafor (Operations Representative)                                 10:04
+  Yeah, absolutely. From an ops perspective, late seat upgrades are painful.
+  Ground staff are handling requests at the gate when they should be focused on
+  boarding. We've also seen cases where a passenger believes they got an upgrade
+  through the old portal but it wasn't actually processed correctly, and that
+  creates re-seating issues on the aircraft. So anything that moves that
+  decision earlier in the journey is a win for us. Also, meals -- if we had
+  confirmed meal preferences earlier, it would genuinely help catering planning.
+  Right now we're often over-ordering because of uncertainty.
+
+Sarah Mitchell (Product Owner)                                           10:06
+  That's a great point on catering, David -- I didn't have that in our original
+  scope notes. James, can you add that as a secondary value driver in the
+  business case document?
+
+--------------------------------------------------------------------------------
+[10:07 AM]
+
+Claire O'Brien (Tech Lead)                                               10:07
+  Before we go too deep into scope -- I want to flag some technical
+  considerations early so we don't paint ourselves into a corner. The current
+  booking system has a fairly monolithic architecture. Seat availability and
+  inventory is managed by the PSS -- our Passenger Service System -- which is
+  the Amadeus Altea integration. Any real-time seat map or upgrade
+  recommendation logic will need to call into that system. The challenge is
+  that Altea API calls have a latency ceiling we need to respect, especially if
+  we want to surface personalised recommendations mid-flow without degrading
+  the booking experience.
+
+James Nguyen (Business Analyst)                                          10:09
+  So are you saying we can't do real-time seat recommendations? Or just that we
+  need to be careful about when we call the API?
+
+Claire O'Brien (Tech Lead)                                               10:10
+  We can do real-time, but we need to think about caching strategies and where
+  in the funnel we trigger the calls. What I'd suggest is that we fetch seat
+  availability once when the passenger selects their flight, and cache that
+  inventory snapshot for the duration of that session -- maybe 15 minutes --
+  before refreshing. We should avoid calling Altea on every page render. That
+  should give us acceptable performance. The recommendation logic itself -- the
+  "you might like" personalisation -- could be a separate microservice we build
+  in-house using booking history and loyalty tier data.
+
+Sarah Mitchell (Product Owner)                                           10:12
+  That sounds reasonable. Claire, can you put together a brief technical spike
+  document outlining that caching approach and the proposed microservice
+  boundary? I'd want the team to review it before we commit to an architecture
+  direction.
+
+--------------------------------------------------------------------------------
+[10:13 AM]
+
+David Okafor (Operations Representative)                                 10:13
+  Can I raise something from an ops angle? If a passenger selects and pays for
+  a specific seat during booking and then the flight is retimed or cancelled,
+  how do we handle the seat assignment in the rebooking workflow? At the moment,
+  re-accommodation is mostly manual. If we've got passengers with paid seat
+  preferences baked into the booking, that adds complexity to the
+  re-accommodation process. I don't know if that's a near-term concern, but
+  I've seen it catch teams off guard before.
+
+Sarah Mitchell (Product Owner)                                           10:15
+  That's a really important edge case, David. I want to make sure we address
+  that in the requirements. James, can you add a user story around disruption
+  and re-accommodation handling as a must-have acceptance criteria block?
+
+James Nguyen (Business Analyst)                                          10:16
+  Will do. Though I'll flag -- there's a follow-up question we need answered
+  before I can fully spec that out. What is the current SLA and policy for
+  re-accommodating passengers with paid ancillaries in the event of a flight
+  disruption? Does the refund or transfer obligation sit with revenue management
+  or with ops?
+
+David Okafor (Operations Representative)                                 10:17
+  I can chase that up. I'll reach out to the Revenue Management team this week
+  and get back to James with a clear policy position.
+
+--------------------------------------------------------------------------------
+[10:18 AM]
+
+Sarah Mitchell (Product Owner)                                           10:18
+  Great. Let's talk about scope for the first release. Based on what we've
+  discussed, I'm thinking MVP covers: seat selection with upgrade upsell during
+  the booking flow, meal preference selection for eligible services, and a basic
+  loyalty-tier-aware recommendation nudge. What's everyone's read on
+  feasibility for a Q3 release?
+
+Claire O'Brien (Tech Lead)                                               10:19
+  Seat selection -- feasible. Meal preferences -- feasible, assuming the
+  catering system has an API we can integrate with. That's actually a gap I
+  haven't fully investigated yet. The personalisation engine is the wildcard.
+  Building a recommendation microservice that's actually reliable and fair
+  across fare classes is not trivial. For Q3, I'd honestly scope that down to a
+  rule-based nudge -- "passengers in Business frequently add lounge access" --
+  rather than a full ML model. Save the ML approach for a later iteration.
+
+James Nguyen (Business Analyst)                                          10:21
+  Agree with Claire on the rule-based approach for v1. From a business
+  perspective, even a simple nudge based on fare class and route has shown good
+  conversion uplift in competitor analysis. Also -- one thing I want to
+  validate: are we building this for web only first, or does it need to be
+  parity with the mobile app on day one? That would significantly change the
+  scope estimate.
+
+Sarah Mitchell (Product Owner)                                           10:22
+  Good question. My initial instinct is web-first for MVP, then mobile in the
+  release after -- but I need to confirm that with the Head of Digital. I'll
+  get that confirmed and circulate before the next sprint planning.
+
+--------------------------------------------------------------------------------
+[10:23 AM]
+
+David Okafor (Operations Representative)                                 10:23
+  Just one more thing from my side -- what's the plan for group bookings?
+  Corporate accounts and travel agents often book 10-plus passengers at a time.
+  The seat selection flow you're describing sounds very individual-passenger
+  focused. We've had feedback from our B2B desk that group booking tools are
+  pretty clunky right now and this could be a chance to improve that. Or is
+  that too far out of scope?
+
+Sarah Mitchell (Product Owner)                                           10:24
+  I'd say that's out of scope for MVP -- group bookings have a completely
+  different UX and business logic flow. But it's worth capturing as a future
+  consideration. James, can you add a group bookings future-state note to the
+  product backlog?
+
+James Nguyen (Business Analyst)                                          10:25
+  Done -- I'll log that as a future epic with David's feedback as a reference.
+
+Claire O'Brien (Tech Lead)                                               10:26
+  Just looping back to the catering API question I mentioned earlier -- I don't
+  actually know if our catering partner has a real-time API available. That's
+  something I'll need to investigate as part of the technical spike. If they
+  don't, meal preferences might need to be stored on our side and communicated
+  via a batch process, which changes the real-time visibility story for ops.
+
+David Okafor (Operations Representative)                                 10:27
+  From what I know it's currently batch -- we send Special Meal Requests via
+  SSIM message files, I think 24 hours before departure. But honestly, Claire,
+  you'd want to talk directly to the catering integration team. I can connect
+  you with Marcus from that side if that helps.
+
+Claire O'Brien (Tech Lead)                                               10:28
+  That would be brilliant, yes please David.
+
+David Okafor (Operations Representative)                                 10:28
+  I'll introduce you over email today.
+
+--------------------------------------------------------------------------------
+[10:29 AM]
+
+Sarah Mitchell (Product Owner)                                           10:29
+  Ok, we're coming up on time. Let me just do a quick recap of where we've
+  landed. We're aligned on an MVP scope that covers seat selection with upgrade
+  upselling, meal preferences with rule-based recommendations at booking.
+  Web-first, pending confirmation. We have four action items and three open
+  questions to resolve before we can fully spec the requirements -- James will
+  be tracking those in the backlog. I'll send a follow-up summary to the
+  broader team after this call. Does anyone have anything urgent before we
+  close out?
+
+James Nguyen (Business Analyst)                                          10:30
+  Nothing urgent from me. I'll have a draft user story map ready for review
+  by Thursday.
+
+Claire O'Brien (Tech Lead)                                               10:31
+  All good from me. I'll aim to have the spike doc drafted by end of next week
+  -- sooner if the catering call happens quickly.
+
+David Okafor (Operations Representative)                                 10:31
+  Nothing from me. Happy to review the user story map once it's ready --
+  especially the disruption handling stories.
+
+Sarah Mitchell (Product Owner)                                           10:32
+  Perfect. Thanks everyone -- really productive session. I'll circulate the
+  summary and action items this afternoon. Talk soon!
+
+================================================================================
+Meeting ended at 10:32 AM
+================================================================================

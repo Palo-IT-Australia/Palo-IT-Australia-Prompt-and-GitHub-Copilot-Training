@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flight Booking System</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f0f4f8;
+      color: #1a202c;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1a202c;
+      letter-spacing: -0.5px;
+    }
+
+    .epic-badge {
+      display: inline-block;
+      margin-top: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #c05621;
+      background: #fff3e0;
+      border: 1px solid #f6ad55;
+      border-radius: 999px;
+      padding: 0.2rem 0.75rem;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── Card shell ── */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      color: #2d3748;
+    }
+
+    /* ── Flight item ── */
+    .flight-list { display: flex; flex-direction: column; gap: 0.875rem; }
+
+    .flight-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      transition: border-color .2s, box-shadow .2s;
+      cursor: pointer;
+    }
+
+    .flight-item:hover {
+      border-color: #e53e3e;
+      box-shadow: 0 2px 10px rgba(229,62,62,.12);
+    }
+
+    .flight-item-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .route {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1a202c;
+    }
+
+    .route .arrow {
+      color: #e53e3e;
+      margin: 0 0.3rem;
+    }
+
+    .iata {
+      font-size: 0.78rem;
+      font-weight: 400;
+      color: #718096;
+    }
+
+    .price-block { text-align: right; }
+
+    .price {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #1a202c;
+    }
+
+    .cabin {
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 1px;
+    }
+
+    .cabin.economy    { color: #2b6cb0; }
+    .cabin.premium    { color: #6b46c1; }
+
+    .flight-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.45rem;
+      font-size: 0.82rem;
+      color: #718096;
+      flex-wrap: wrap;
+    }
+
+    .flight-meta .dot { color: #cbd5e0; }
+
+    .select-link {
+      display: inline-block;
+      margin-top: 0.65rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #e53e3e;
+      text-decoration: none;
+      transition: color .15s;
+    }
+
+    .select-link:hover { color: #c53030; text-decoration: underline; }
+
+    /* ── Booking Manaent ── */
+    .booking-card {
+      border: 1.5px dashed #cbd5e0;
+      background: #f7fafc;
+    }
+
+    .booking-card .card-title { color: #e53e3e; }
+
+    .booking-label {
+      font-size: 0.85rem;
+      color: #4a5568;
+      margin-bottom: 0.6rem;
+    }
+
+    .booking-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .booking-row input {
+      flex: 1;
+      padding: 0.6rem 0.9rem;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: #2d3748;
+      background: #fff;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .booking-row input:focus {
+      border-color: #e53e3e;
+      box-shadow: 0 0 0 3px rgba(229,62,62,.15);
+    }
+
+    .booking-row button {
+      padding: 0.6rem 1.4rem;
+      background: #e53e3e;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .booking-row button:hover { background: #c53030; }
+
+    @media (max-width: 480px) {
+      .flight-item-top { flex-direction: column; align-items: flex-start; }
+      .price-block { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <header class="page-header">
+      <h1>Flight Booking System</h1>
+      <span class="epic-badge"> Seat Selection &amp; Upgrade Upsell</span>
+    </header>
+
+    <!-- Flight Selection -->
+    <section class="card">
+      <h2 class="card-title">Select Your Flight</h2>
+      <div class="flight-list">
+
+        <!-- Flight 1 -->
+        <div class="flight-item">
+          <div class="flight-item-top">
+            <span class="route">
+              London <span class="iata">(LHR)</span>
+              <span class="arrow">→</span>
+              New York <span class="iata">(JFK)</span>
+            </span>
+            <div class="price-block">
+              <div class="price">$450</div>
+              <div class="cabin economy">Economy</div>
+            </div>
+          </div>
+          <div class="flight-meta">
+            <span>2026-04-15</span>
+            <span class="dot">|</span>
+            <span>10:30</span>
+            <span class="dot">|</span>
+            <span>7h 45m</span>
+          </div>
+          <a class="select-link" href="#">Click to select seats →</a>
+        </div>
+
+        <!-- Flight 2 -->
+        <div class="flight-item">
+          <div class="flight-item-top">
+            <span class="route">
+              London <span class="iata">(LHR)</span>
+              <span class="arrow">→</span>
+              Paris <span class="iata">(CDG)</span>
+            </span>
+            <div class="price-block">
+              <div class="price">$120</div>
+              <div class="cabin economy">Economy</div>
+            </div>
+          </div>
+          <div class="flight-meta">
+            <span>2026-04-16</span>
+            <span class="dot">|</span>
+            <span>14:00</span>
+            <span class="dot">|</span>
+            <span>1h 15m</span>
+          </div>
+          <a class="select-link" href="#">Click to select seats →</a>
+        </div>
+
+        <!-- Flight 3 -->
+        <div class="flight-item">
+          <div class="flight-item-top">
+            <span class="route">
+              London <span class="iata">(LHR)</span>
+              <span class="arrow">→</span>
+              Dubai <span class="iata">(DXB)</span>
+            </span>
+            <div class="price-block">
+              <div class="price">$680</div>
+              <div class="cabin premium">Premium Economy</div>
+            </div>
+          </div>
+          <div class="flight-meta">
+            <span>2026-04-17</span>
+            <span class="dot">|</span>
+            <span>22:15</span>
+            <span class="dot">|</span>
+            <span>6h 30m</span>
+          </div>
+          <a class="select-link" href="#">Click to select seats →</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Booking Management -->
+    <section class="card booking-card">
+      <h2 class="card-title">Booking Manament</h2>
+      <p class="booking-label">Have an existing booking? Enter your booking reference:</p>
+      <div class="booking-row">
+        <input type="text" placeholder="e.g., BK12345" aria-label="Booking reference" maxlength="20" />
+        <button type="button">View</button>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
